@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ajax基础</title>
+    <!-- 引入jquery，简化ajax请求的发送 -->
+    <script src="jquery-3.7.0.js"></script>
+    <style>
+        table {
+            text-align: center;
+        }
+
+        thead {
+            background-color: #ccc;
+        }
+
+        form {
+            margin: 150px auto;
+            text-align: center;
+        }
+
+        .blockLabel {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="table">
+        <thead>
+            <button>
+                <!-- <a  href="/employee/goAddEmployee2">新增</a> -->
+                <a href="./form提交新增界面.html">form表单新增</a>
+            </button>
+            <button>
+                <a href="./json提交新增页面.html">json新增</a>
+            </button>
+
+            <tr style="height: 50px">
+                <th style="width: 100px">员工ID</th>
+                <th style="width: 100px">员工姓名</th>
+                <th style="width: 100px">员工职位</th>
+                <th style="width: 100px">员工性别</th>
+                <th style="width: 200px">入职时间</th>
+                <th style="width: 200px">修改时间</th>
+                <th style="width: 200px">合同期限</th>
+                <th style="width: 100px">状态</th>
+                <th style="width: 200px">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tableTr">
+
+        </tbody>
+    </table>
+
+    <script>
+        window.onload = getList()
+
+        function getList() {
+
+            $.ajax({
+                url: 'http://127.0.0.1:8080/employee/getEmployeeList',
+                type: 'get',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                    pushData(data)
+                },
+                error: function (errorMsg) {
+                    console.log(errorMsg)
+                    alert(errorMsg)
+                }
+            })
+        }
+
+        function pushData(list) {
+            const tableTr = document.getElementById('tableTr')
+            let tdData = ''
+            for (let i = 0; i < list.length; i++) {
+                const jsonData = list[i]
+                tdData += '<tr>'
+                tdData += '<td>' + jsonData.id + '</td>'
+                tdData += '<td>' + jsonData.name + '</td>'
+                tdData += '<td>' + jsonData.duty + '</td>'
+                tdData += '<td>' + jsonData.sex + '</td>'
+                tdData += '<td>' + jsonData.createTime + '</td>'
+                tdData += '<td>' + (jsonData.editTime ? jsonData.editTime : '') + '</td>'
+                tdData += '<td>' + jsonData.contractDeadline + '</td>'
+                tdData += '<td>' + (jsonData.isDepart ? '离职' : '在职') + '</td>'
+                tdData += '<td><button onclick="delData(' + jsonData.id + ')">删除</button><button onclick="editData2(' + '\'' + jsonData.id + '\'' + ')">编辑</button></td>'
+                tdData += '</tr>'
+            }
+            tableTr.innerHTML = tdData
+        }
+
+        function delData(id) {
+            console.log(id)
+            $.ajax({
+                url: 'http://127.0.0.1:8080/employee/delEmployee',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(
+                    {
+                        "id": id
+                    }
+                ),
+                success: function (data) {
+                    getList()
+                },
+                error: function (errorMsg) {
+                    console.log(errorMsg)
+                    alert(errorMsg)
+                }
+            })
+
+        }
+        function editData2(id) {
+            window.location.href = './json提交新增页面.html?id=' + id
+        }
+
+    </script>
+</body>
+
+</html>

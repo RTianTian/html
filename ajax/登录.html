@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.0.js"></script>
+</head>
+<style>
+    .index {
+        width: 30%;
+        min-width: 350px;
+        height: 370px;
+        margin: 150px auto;
+        padding-top: 30px;
+        text-align: center;
+        background-color: #ccc;
+        border-radius: 17px;
+        overflow: hidden;
+        transition: 0.5s all;
+    }
+
+    .registerClass {
+        width: 30%;
+        min-width: 350px;
+        height: 500px;
+        margin: 100px auto;
+        padding-top: 30px;
+        text-align: center;
+        background-color: #ccc;
+        border-radius: 17px;
+        overflow: hidden;
+        transition: 0.5s all;
+    }
+
+    .buttonBox {
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .buttonBox button {
+        text-decoration: none;
+        font-size: 1.5rem;
+        display: inline-block;
+        width: 90px;
+        height: 40px;
+        color: white;
+        text-align: center;
+        border: 0;
+        border-radius: 7px;
+        margin: 0 5px;
+        transition: all 0.2s;
+    }
+
+    .buttonBox> :nth-child(1) {
+        background-color: #eeb4be;
+    }
+
+    .buttonBox> :nth-child(2) {
+        background-color: #6abb91;
+    }
+
+    .buttonBox button:hover {
+        transform: scale(1.1);
+    }
+
+    .buttonBox button:active {
+        transform: scale(0.9);
+    }
+
+    .formInput {
+        width: 88%;
+        height: 35px;
+        border-radius: 7px;
+        border: 1px solid;
+        margin-top: 20px;
+        outline: 0 solid;
+        display: inline-block;
+        transition: all 0.3s ease;
+        padding: 2px 10px;
+    }
+
+    .formInput:hover {
+        box-shadow: 0 0 30px pink;
+        background-color: paleturquoise;
+        transform: scale(1.05, 1.05);
+        transition: all 0.3s ease;
+    }
+
+    .formInput:focus {
+        box-shadow: 0 0 30px pink;
+        background-color: paleturquoise;
+        transform: scale(1.05, 1.05);
+        transition: all 0.3s ease;
+    }
+
+    #login button,
+    #register button {
+        width: 92%;
+        height: 35px;
+        border-radius: 7px;
+        border: 1px solid;
+        outline: 0 solid;
+        display: block;
+        margin: 20px auto;
+        transition: all 0.3s ease;
+    }
+
+    #login button:focus,
+    #register button:focus {
+        box-shadow: 5px 5px 10px pink;
+        background-color: paleturquoise;
+    }
+
+    #login button:hover,
+    #register button:hover {
+        box-shadow: 5px 5px 10px pink;
+        background-color: paleturquoise;
+        transform: scale(1.05, 1.05);
+        transition: all 0.5s ease;
+    }
+
+    #login button:active,
+    #register button:active {
+        box-shadow: 0 0 10px yellow;
+        background-color: pink;
+        transform: scale(1, 1);
+        transition: all 0.05s ease;
+    }
+</style>
+
+<body>
+    <div id="index" class="index">
+        <div class="buttonBox">
+            <button onclick="changeLoginFlag()">登录</button>
+            <button onclick="changeRegisterFlag()">注册</button>
+        </div>
+        <div id="login">
+            <h1>XX系统</h1>
+
+            <label>
+                <input id="loginMobilePhoneInput" class="formInput" type="text" name="mobilePhone" placeholder="请输入手机号">
+            </label>
+            <label>
+                <input id="loginPasswordInput" class="formInput" type="password" name="password" placeholder="请输入密码">
+            </label>
+            <button onclick="getpassword()">登录</button>
+        </div>
+        <div id="register" style="display: none">
+            <h1>欢迎注册XX系统</h1>
+
+            <label>
+                <input id="registerName" class="formInput" type="text" name="username" placeholder="给自己起个好听的名字吧">
+            </label>
+            <label>
+                <input id="registerId" class="formInput" type="text" name="mobilePhone" placeholder="输入手机号作为账号">
+            </label>
+            <label>
+                <input id="registerPassword" class="formInput" type="password" name="password" placeholder="请输入密码">
+            </label>
+            <label>
+                <input id="registerRepassword" class="formInput" type="password" name="rePassword"
+                    placeholder="请再次输入密码">
+            </label>
+            <button onclick="register()">注册</button>
+            <span id="registerMsg" style="color: #ac2925"></span>
+        </div>
+    </div>
+
+    <script>
+        function changeLoginFlag() {
+            const index = document.getElementById('index');
+            const login = document.getElementById('login');
+            const register = document.getElementById('register');
+            index.className = 'index'
+            register.style.display = 'none'
+            login.style.display = 'block';
+        }
+
+        function changeRegisterFlag() {
+            const index = document.getElementById('index');
+            const login = document.getElementById('login');
+            const register = document.getElementById('register');
+            index.className = 'registerClass'
+            login.style.display = 'none'
+            register.style.display = 'block';
+        }
+
+        function getpassword() {
+            const mobilePhone = document.getElementById("loginMobilePhoneInput")
+            const password = document.getElementById("loginPasswordInput")
+            $.ajax({
+                url: 'http://127.0.0.1:8080/user/login',
+                type: 'post',
+                data: {
+                    mobilePhone: mobilePhone.value,
+                    password: password.value
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data === '成功') {
+                        window.location.href = "./ajax基础.html"
+                    }
+                },
+                error: function (errorMsg) {
+                    alert(JSON.stringify(errorMsg))
+                }
+            })
+        }
+        function register() {
+            const username = document.getElementById("registerName")
+            const mobilePhoned = document.getElementById("registerId")
+            const password = document.getElementById("registerPassword")
+            const rePassword = document.getElementById("registerRepassword")
+            $.ajax({
+                url: 'http://127.0.0.1:8080/user/register2',
+                type: 'post',
+                data: {
+                    username: username.value,
+                    mobilePhone: mobilePhoned.value,
+                    password: password.value,
+                    rePassword: rePassword.value
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data === '注册成功') {
+                        changeLoginFlag()
+                    } else {
+                        const loginDiv = document.getElementById("registerMsg")
+                        loginDiv.innerText = data
+                    }
+                },
+                error: function (errorMsg) {
+                    alert(JSON.stringify(errorMsg))
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

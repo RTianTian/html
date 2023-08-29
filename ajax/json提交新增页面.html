@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./jquery-3.7.0.js"></script>
+    <style>
+        .form {
+            margin: 150px auto;
+            text-align: center;
+        }
+
+        html {
+            text-align: center;
+        }
+
+        .blockLabel {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form">
+        <!--这一行用于编辑的时候向后端传输employee的id，但是不用显示出来，所以display: none（form的action提交的内容是form标签里的所有input）-->
+        <input id="addid" style="display: none" type="text">
+        <label class="blockLabel">
+            名字:
+            <input id="addname" type="text" value="">
+        </label>
+        <label class="blockLabel">
+            职位:
+            <input id="addduty" type="text" value="">
+        </label>
+        <label class="blockLabel">
+            合同期限:
+            <input id="addcontract" type="datetime-local" value="">
+        </label>
+        <label class="blockLabel">
+            性别:
+            <label>
+                <input id="addsex" type="radio" name="sex" value="" checked="男">
+                男
+            </label>
+            <label>
+                <input id="addsex" type="radio" name="sex" value="" checked="女">
+                女
+            </label>
+        </label>
+
+        <button onclick="addData()">提交</button>
+
+    </div>
+
+
+    <script>
+        window.onload = function () {
+            //?id=2&name=天天2&duty=学生&sex=女
+            //下面的操作把上面的字符串解析成一个个的参数
+            const originParams = decodeURI(window.location.search)
+            if (originParams && originParams !== '') {
+                console.log(originParams)
+                const params = originParams.split('?')[1]
+                console.log(params)
+                const paramList = params.split('&')
+                console.log(paramList)
+                let idParam = paramList[0]
+                console.log(idParam)
+                const id = idParam.slice(idParam.indexOf('=') + 1)
+                console.log('id的值：' + id)
+                document.getElementById("addid").value = id
+
+                //获取到id以后，根据id向后端查询出其他字段的值，然后给输入框显示，自己写
+                //写完了 哪是通过id获取的？你去后端看戏这个接口  没看懂，我看出来是通过id传参了，但是没看出来，名字那些属性是怎么通过id获取的
+                $.ajax({
+                    // 在地址上通过id获取
+                    url: 'http://127.0.0.1:8080/employee/goEditEmployee/' + id,
+                    type: 'get',
+                    success: function (data) {
+                        console.log(data)
+                        // 将获取到的属性传给输入框
+                        document.getElementById("addname").value = data.name //这看懂了
+                        document.getElementById("addduty").value = data.duty
+                        document.getElementById("addsex").value = data.sex
+                        document.getElementById("addcontract").value = data.contractDeadline
+                    },
+                    error: function (errorMsg) {
+                        alert("获取数据失败")
+                        console.log(errorMsg)
+                    }
+                })
+            }
+        }
+
+
+        function addData() {
+            const id = document.getElementById("addid")
+            const name = document.getElementById("addname")
+            const duty = document.getElementById("addduty")
+            const sex = document.getElementById("addsex") //获取输入框的值，传给后端保存
+            const contractDeadline = document.getElementById("addcontract")
+            $.ajax({
+                url: 'http://127.0.0.1:8080/employee/jsonAddOrEditEmployee',
+                type: 'post',
+                contentType: 'application/json',
+                // 保存
+                // 将JavaScript对象或值转换为 JSON 字符串
+                data: JSON.stringify(
+                    {
+                        id: id.value,
+                        name: name.value,
+                        duty: duty.value,
+                        sex: sex.value,
+                        contractDeadline: contractDeadline.value.replace('T', ' ') + ':00'
+                    }
+                ),
+                success: function (data) {
+                    console.log(data)
+                    if (data) {
+                        window.location.href = './ajax基础.html'
+                    }
+                },
+                error: function (errorMsg) {
+                    alert("新增数据失败")
+                    console.log(errorMsg)
+                }
+            })
+        }
+
+    </script>
+</body>
+
+</html>
