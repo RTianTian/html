@@ -27,6 +27,8 @@
     <div class="form">
         <!--这一行用于编辑的时候向后端传输employee的id，但是不用显示出来，所以display: none（form的action提交的内容是form标签里的所有input）-->
         <input id="addid" style="display: none" type="text">
+<!--        将一个 <label> 和一个 <input> 元素匹配在一起，你需要给 <input> 一个 id 属性。
+而 <label> 需要一个 for 属性，其值和 <input> 的 id 一样。这样才会点击输入框，以前输入过的值可在下拉菜单中出现-->
         <label class="blockLabel">
             名字:
             <input id="addname" type="text" value="">
@@ -42,6 +44,7 @@
         <label class="blockLabel">
             性别:
             <label>
+<!--                二选一的话，换成class，不能用id了-->
                 <input class="sexClass" type="radio" name="sex" value="男" checked>
                 男
             </label>
@@ -50,13 +53,14 @@
                 女
             </label>
         </label>
-
+<!--点击提交按钮，便会触发addData()方法-->
         <button onclick="addData()">提交</button>
 
     </div>
 
 
     <script>
+        //window.onload 当文档加载完成之后，便立即能触发该函数
         window.onload = function () {
             //?id=2&name=天天2&duty=学生&sex=女
             //下面的操作把上面的字符串解析成一个个的参数
@@ -76,6 +80,7 @@
                 //获取到id以后，根据id向后端查询出其他字段的值，然后给输入框显示，自己写
                 //写完了 哪是通过id获取的？你去后端看戏这个接口  没看懂，我看出来是通过id传参了，但是没看出来，名字那些属性是怎么通过id获取的
                 $.ajax({
+                    // 编辑
                     // 在地址上通过id获取
                     url: 'http://127.0.0.1:8080/employee/goEditEmployee/' + id,
                     type: 'get',
@@ -84,8 +89,9 @@
                         // 将获取到的属性传给输入框
                         document.getElementById("addname").value = data.name
                         document.getElementById("addduty").value = data.duty
-
+                        // 得到两个对象，男或女
                         const sexList = document.getElementsByClassName('sexClass')
+                        // 循环，将值传给sexList对象，然后那个对象就被checked(意思是哪个值能变蓝)，然后在下面接着被获取
                         for (let i = 0; i < sexList.length; i++) {
                             if (sexList[i].value === data.sex) {
                                 sexList[i].checked = true
@@ -102,8 +108,9 @@
             }
         }
 
-
+        // 新增操作
         function addData() {
+            // 获取后端的值
             const id = document.getElementById("addid")
             const name = document.getElementById("addname")
             const duty = document.getElementById("addduty")
