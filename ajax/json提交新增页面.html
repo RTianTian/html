@@ -42,11 +42,11 @@
         <label class="blockLabel">
             性别:
             <label>
-                <input id="addsex" type="radio" name="sex" value="" checked="男">
+                <input class="sexClass" type="radio" name="sex" value="男" checked>
                 男
             </label>
             <label>
-                <input id="addsex" type="radio" name="sex" value="" checked="女">
+                <input class="sexClass" type="radio" name="sex" value="女">
                 女
             </label>
         </label>
@@ -82,9 +82,16 @@
                     success: function (data) {
                         console.log(data)
                         // 将获取到的属性传给输入框
-                        document.getElementById("addname").value = data.name //这看懂了
+                        document.getElementById("addname").value = data.name
                         document.getElementById("addduty").value = data.duty
-                        document.getElementById("addsex").value = data.sex
+
+                        const sexList = document.getElementsByClassName('sexClass')
+                        for (let i = 0; i < sexList.length; i++) {
+                            if (sexList[i].value === data.sex) {
+                                sexList[i].checked = true
+                            }
+                        }
+
                         document.getElementById("addcontract").value = data.contractDeadline
                     },
                     error: function (errorMsg) {
@@ -100,7 +107,13 @@
             const id = document.getElementById("addid")
             const name = document.getElementById("addname")
             const duty = document.getElementById("addduty")
-            const sex = document.getElementById("addsex") //获取输入框的值，传给后端保存
+            let sex = ''
+            const sexList = document.getElementsByClassName('sexClass')
+            for (let i = 0; i < sexList.length; i++) {
+                if (sexList[i].checked) {
+                    sex = sexList[i].value
+                }
+            }
             const contractDeadline = document.getElementById("addcontract")
             $.ajax({
                 url: 'http://127.0.0.1:8080/employee/jsonAddOrEditEmployee',
@@ -113,7 +126,7 @@
                         id: id.value,
                         name: name.value,
                         duty: duty.value,
-                        sex: sex.value,
+                        sex: sex,
                         contractDeadline: contractDeadline.value.replace('T', ' ') + ':00'
                     }
                 ),
