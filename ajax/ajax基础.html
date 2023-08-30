@@ -65,11 +65,9 @@
         window.onload = getList
 
         function getList() {
-
             $.ajax({
                 url: 'http://127.0.0.1:8080/employee/getEmployeeList',
                 type: 'get',
-                dataType: 'json',
                 success: function (data) {
                     console.log(data)
                     pushData(data)
@@ -106,7 +104,6 @@
             $.ajax({
                 url: 'http://127.0.0.1:8080/employee/delEmployee',
                 type: 'POST',
-                dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify(
                     {
