@@ -34,97 +34,135 @@
 </head>
 
 <body>
-    <table id="table">
-        <thead>
-            <button>
-                <!-- <a  href="/employee/goAddEmployee2">新增</a> -->
-                <a href="./form提交新增界面.html">form表单新增</a>
-            </button>
-            <button>
-                <a href="./json提交新增页面.html">json新增</a>
-            </button>
+<table id="table">
+    <thead>
+    <button>
+        <!-- <a  href="/employee/goAddEmployee2">新增</a> -->
+        <a href="./form提交新增界面.html">form表单新增</a>
+    </button>
+    <button>
+        <a href="./json提交新增页面.html">json新增</a>
+    </button>
+    <button onclick="getList()">
+        搜索
+    </button>
+    <input id="search" type="text" value="" placeholder="姓名模糊搜索">
 
-            <tr style="height: 50px">
-                <th style="width: 100px">员工ID</th>
-                <th style="width: 100px">员工姓名</th>
-                <th style="width: 100px">员工职位</th>
-                <th style="width: 100px">员工性别</th>
-                <th style="width: 200px">入职时间</th>
-                <th style="width: 200px">修改时间</th>
-                <th style="width: 200px">合同期限</th>
-                <th style="width: 100px">状态</th>
-                <th style="width: 200px">操作</th>
-            </tr>
-        </thead>
-        <tbody id="tableTr">
+    <tr style="height: 50px">
+        <th style="width: 100px">员工ID</th>
+        <th style="width: 100px">员工姓名</th>
+        <th style="width: 100px">员工职位</th>
+        <th style="width: 100px">员工性别</th>
+        <th style="width: 200px">入职时间</th>
+        <th style="width: 200px">修改时间</th>
+        <th style="width: 200px">合同期限</th>
+        <th style="width: 100px">状态</th>
+        <th style="width: 200px">操作</th>
+    </tr>
+    </thead>
+    <tbody id="tableTr">
 
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <script>
-        window.onload = getList
+<script>
+    window.onload = getList
 
-        function getList() {
-            $.ajax({
-                url: 'http://127.0.0.1:8080/employee/getEmployeeList',
-                type: 'get',
-                success: function (data) {
-                    console.log(data)
-                    pushData(data)
-                },
-                error: function (errorMsg) {
-                    console.log(errorMsg)
-                    alert(errorMsg)
-                }
-            })
-        }
-
-        function pushData(list) {
-            const tableTr = document.getElementById('tableTr')
-            let tdData = ''
-            for (let i = 0; i < list.length; i++) {
-                const jsonData = list[i]
-                tdData += '<tr>'
-                tdData += '<td>' + jsonData.id + '</td>'
-                tdData += '<td>' + jsonData.name + '</td>'
-                tdData += '<td>' + jsonData.duty + '</td>'
-                tdData += '<td>' + jsonData.sex + '</td>'
-                tdData += '<td>' + jsonData.createTime + '</td>'
-                tdData += '<td>' + (jsonData.editTime ? jsonData.editTime : '') + '</td>'
-                tdData += '<td>' + jsonData.contractDeadline + '</td>'
-                tdData += '<td>' + (jsonData.isDepart ? '离职' : '在职') + '</td>'
-                tdData += '<td><button onclick="delData(' + jsonData.id + ')">删除</button><button onclick="editData2(' + '\'' + jsonData.id + '\'' + ')">编辑</button></td>'
-                tdData += '</tr>'
+    function getList() {
+        const searchString = document.getElementById("search")
+        $.ajax({
+            url: 'http://127.0.0.1:8080/employee/getEmployeeList',
+            type: 'get',
+            data: {
+                // 通过名字搜索，传给后端
+                name: searchString.value,
+            },
+            success: function (data) {
+                console.log(data)
+                pushData(data)
+            },
+            error: function (errorMsg) {
+                console.log(errorMsg)
+                alert(errorMsg)
             }
-            tableTr.innerHTML = tdData
-        }
+        })
+    }
 
-        function delData(id) {
-            console.log(id)
-            $.ajax({
-                url: 'http://127.0.0.1:8080/employee/delEmployee',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(
-                    {
-                        "id": id
-                    }
-                ),
-                success: function (data) {
-                    getList()
-                },
-                error: function (errorMsg) {
-                    console.log(errorMsg)
-                    alert(errorMsg)
+    function pushData(list) {
+        const tableTr = document.getElementById('tableTr')
+        let tdData = ''
+        for (let i = 0; i < list.length; i++) {
+            const jsonData = list[i]
+            let isDepart
+            //jsonData.isDepart为true，是离职状态
+            isDepart = !jsonData.isDepart;
+            tdData += '<tr>'
+            tdData += '<td>' + jsonData.id + '</td>'
+            tdData += '<td>' + jsonData.name + '</td>'
+            tdData += '<td>' + jsonData.duty + '</td>'
+            tdData += '<td>' + jsonData.sex + '</td>'
+            tdData += '<td>' + jsonData.createTime + '</td>'
+            tdData += '<td>' + (jsonData.editTime ? jsonData.editTime : '') + '</td>'
+            tdData += '<td>' + jsonData.contractDeadline + '</td>'
+            tdData += '<td>' + (jsonData.isDepart ? '离职' : '在职') + '</td>'
+            tdData += '<td>' +
+                '<button onclick="delData(' + jsonData.id + ')">删除</button>' +
+                '<button onclick="editData2(' + jsonData.id + ')">编辑</button >' +
+                '<button onclick="entryData(' + jsonData.id + ',' + isDepart + ')">' + (jsonData.isDepart ? '入职' : '离职') + '</button>' +
+                '</td>'
+            tdData += '</tr>'
+        }
+        tableTr.innerHTML = tdData
+    }
+
+    function delData(id) {
+        console.log(id)
+        $.ajax({
+            url: 'http://127.0.0.1:8080/employee/delEmployee',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                {
+                    id: id
                 }
-            })
+            ),
+            success: function (data) {
+                getList()
+            },
+            error: function (errorMsg) {
+                console.log(errorMsg)
+                alert(errorMsg)
+            }
+        })
 
-        }
-        function editData2(id) {
-            window.location.href = './json提交新增页面.html?id=' + id
-        }
+    }
 
-    </script>
+    function entryData(id, isDepart) {
+        $.ajax({
+            url: 'http://127.0.0.1:8080/employee/entryEmployee',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                {
+                    id: id,
+                    isDepart: isDepart
+                }
+            ),
+            success: function () {
+                getList()
+            },
+            error: function (errorMsg) {
+                console.log(errorMsg)
+                alert(errorMsg)
+            }
+        })
+    }
+
+    function editData2(id) {
+        window.location.href = './json提交新增页面.html?id=' + id
+    }
+
+</script>
 </body>
 
 </html>

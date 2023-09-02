@@ -110,10 +110,10 @@
 
         // 新增操作
         function addData() {
-            // 获取后端的值
-            const id = document.getElementById("addid")
-            const name = document.getElementById("addname")
-            const duty = document.getElementById("addduty")
+            // 获取输入框的值
+            const idInput = document.getElementById("addid")
+            const nameInput = document.getElementById("addname")
+            const dutyInput = document.getElementById("addduty")
             let sex = ''
             const sexList = document.getElementsByClassName('sexClass')
             for (let i = 0; i < sexList.length; i++) {
@@ -130,9 +130,10 @@
                 // 将JavaScript对象或值转换为 JSON 字符串
                 data: JSON.stringify(
                     {
-                        id: id.value,
-                        name: name.value,
-                        duty: duty.value,
+                        // 把前端输入框里的值传给后端
+                        id: idInput.value,
+                        name: nameInput.value,
+                        duty: dutyInput.value,
                         sex: sex,
                         contractDeadline: contractDeadline.value.replace('T', ' ') + ':00'
                     }
